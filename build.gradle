@@ -1,0 +1,38 @@
+buildscript {
+    ext {
+        compose_version = '1.1.1'
+        kotlin_version = '1.6.10'
+    }
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/central/'
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/gradle-plugin/'
+        }
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/central/'
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/google/'
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/public/'
+        }
+        google()
+        mavenCentral()
+    }
+}
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
