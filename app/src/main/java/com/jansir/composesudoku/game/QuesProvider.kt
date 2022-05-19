@@ -5,10 +5,10 @@ import com.jansir.composesudoku.data.Constant
 object QuesProvider {
 
     fun getQuesArray2d(ques: String = Constant.ques): Array<Array<Cell>> {
+        val ans = Constant.answ
         var index = 0
         val sectors =
             arrayOfNulls<CellGroup>(9)
-
         val rows =
             arrayOfNulls<CellGroup>(9)
         val cols =
@@ -20,25 +20,24 @@ object QuesProvider {
         }
         val array2d = Array(9) { rowIndex ->
             Array(9) { colIndex ->
-                Cell(rowIndex, colIndex, ques[index++].toString().toInt()).apply {
+                val cellVal = ques[index].toString().toInt()
+                val ansVal = ans[index++].toString().toInt()
+                Cell(
+                    rowIndex = rowIndex,
+                    colIndex = colIndex,
+                    value = cellVal,
+                    ansValue = ansVal,
+                    isEditable = cellVal == 0
+                ).apply {
                     row = rows[rowIndex]!!
                     col = cols[colIndex]!!
                     sector = sectors[((colIndex / 3) * 3) + (rowIndex / 3)]!!
-                    row.addCell(this)
-                    col.addCell(this)
-                    sector.addCell(this)
+                    row?.addCell(this)
+                    col?.addCell(this)
+                    sector?.addCell(this)
                 }
             }
         }
-/*        array2d.forEach {
-            it.forEach { cell ->
-                cell.row.addCells(array2d[cell.rowIndex])
-                for (i in 0..9) {
-                    cell.col.addCell(array2d[cell.colIndex][i])
-                }
-
-            }
-        }*/
         return array2d
     }
 }
