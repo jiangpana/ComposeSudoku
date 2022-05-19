@@ -25,11 +25,14 @@ class MainViewModel : ViewModel() {
                 } catch (e: Exception) {
                 }
             }
-            is SudokuOperateAction.CHANGE -> {
+            is SudokuOperateAction.CHANGE_VALUE -> {
                 if (!viewStates.selectCell.isEditable) return
+                if (viewStates.selectCell.value == action.value){
+                    action.value = 0
+                }
                 val copyCell = viewStates.selectCell.copy(value = action.value)
                 viewStates.cells!![viewStates.selectCell.rowIndex][viewStates.selectCell.colIndex] = copyCell
-                viewStates = viewStates.copy(selectCell = copyCell)
+//                viewStates = viewStates.copy(selectCell = copyCell)
                 checkSuccess()
             }
             is SudokuOperateAction.DISMISS_DIALOG -> {
@@ -76,14 +79,17 @@ data class SudokuViewState(
 ) {
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
+        println("SudokuViewState equals 调用")
+        //set 时候   return false 会刷新
+        //set get   value 有改变会刷新
+   /*     if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as SudokuViewState
 
         if (gameSuccess != other.gameSuccess) return false
         if (!cells.contentDeepEquals(other.cells)) return false
-        if (selectCell != other.selectCell) return false
+        if (selectCell != other.selectCell) return false*/
 
         return true
     }
@@ -97,7 +103,7 @@ data class SudokuViewState(
 }
 
 sealed class SudokuOperateAction() {
-    class CHANGE(val value: Int) : SudokuOperateAction()
+    class CHANGE_VALUE(var value: Int) : SudokuOperateAction()
     class MOVE(val row: Int, val col: Int) : SudokuOperateAction()
     object SUC : SudokuOperateAction()
     object DISMISS_DIALOG : SudokuOperateAction()

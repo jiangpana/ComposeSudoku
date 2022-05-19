@@ -15,6 +15,7 @@ class AppColors(
     sudoku_view_bg: Color,
     sudokuview_text_color: Color,
     sudokuview_text_color_uneditable: Color,
+    sudokuview_similar_cell_color: Color,
 ) {
     var textPrimary: Color by mutableStateOf(textPrimary)
     var textSecondary: Color by mutableStateOf(textSecondary)
@@ -22,6 +23,7 @@ class AppColors(
     var sudoku_view_bg: Color by mutableStateOf(sudoku_view_bg)
     var sudokuview_text_color: Color by mutableStateOf(sudokuview_text_color)
     var sudokuview_text_color_uneditable: Color by mutableStateOf(sudokuview_text_color_uneditable)
+    var sudokuview_similar_cell_color: Color by mutableStateOf(sudokuview_similar_cell_color)
 }
 
 private val BlueColorPalette = AppColors(
@@ -31,6 +33,7 @@ private val BlueColorPalette = AppColors(
     sudoku_view_bg = Color.White,
     sudokuview_text_color = Color(0xff1D62BF),
     sudokuview_text_color_uneditable = Color.Black,
+    sudokuview_similar_cell_color = Color.Green,
 
     )
 private val DarkColorPalette = AppColors(
@@ -40,6 +43,7 @@ private val DarkColorPalette = AppColors(
     sudoku_view_bg = Color(0xff242627),
     sudokuview_text_color =Color(0xffB7EBFF),
     sudokuview_text_color_uneditable =Color(0xffAFAFAF),
+    sudokuview_similar_cell_color =Color.Gray,
     )
 
 @Composable
@@ -61,6 +65,7 @@ fun ComposeSudokuTheme(
         sudoku_view_bg = animateColorAsState(targetColors.sudoku_view_bg, TweenSpec(600)).value,
         sudokuview_text_color =  animateColorAsState(targetColors.sudokuview_text_color, TweenSpec(600)).value,
         sudokuview_text_color_uneditable =  animateColorAsState(targetColors.sudokuview_text_color_uneditable, TweenSpec(600)).value,
+        sudokuview_similar_cell_color =  animateColorAsState(targetColors.sudokuview_similar_cell_color, TweenSpec(600)).value,
     )
 
     val systemUiCtrl = rememberSystemUiController()

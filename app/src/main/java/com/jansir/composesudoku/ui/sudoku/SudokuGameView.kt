@@ -30,8 +30,17 @@ var sudoku_text_size = 20.dp
 @Composable
 fun SudokuGameView(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     println("SudokuView  执行")
+    val textPaint = Paint().apply {
+        color = AppTheme.colors.sudokuview_text_color
+    }
+    val textUnEditPaint = Paint().apply {
+        color = AppTheme.colors.sudokuview_text_color_uneditable
+    }
+    val  similarCellColor=  AppTheme.colors.sudokuview_similar_cell_color
+
     val data = viewModel.viewStates.cells!!
     val selectCell =  viewModel.viewStates.selectCell
+
     LaunchedEffect(Unit) {
         viewModel.viewEvents.collect {
 
@@ -59,13 +68,6 @@ fun SudokuGameView(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             .height(screenWidth)
     ) {
 
-        val textPaint = Paint().apply {
-            color = AppTheme.colors.sudokuview_text_color
-        }
-        val textUnEditPaint = Paint().apply {
-            color = AppTheme.colors.sudokuview_text_color_uneditable
-        }
-
         Canvas(
             modifier = Modifier
                 .padding(sudoku_view_padding)
@@ -82,11 +84,30 @@ fun SudokuGameView(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             height = size.width
             cellWidth = (size.width) / 9.0f
             drawHighlightColRowSec(selectCell)
+            drawSimilarCell(selectCell,data,similarCellColor)
             drawLine(height, width)
-            drawCellValue(data, textPaint, textUnEditPaint)
+            drawCellValue(data, textPaint,textUnEditPaint)
         }
     }
 
+}
+
+private fun DrawScope.drawSimilarCell(
+    selectCell: Cell,
+    data: Array<Array<Cell>>,
+    color: Color
+) {
+    val value = selectCell.value
+    if (value==0)return
+    data.forEach {
+        it.forEach {
+            if (it.value == value&&it!=selectCell){
+                val topLeft = Offset(it.colIndex* cellWidth  , it.rowIndex* cellWidth )
+                val size = Size(cellWidth,cellWidth)
+                drawRect(color,topLeft,size)
+            }
+        }
+    }
 }
 
 private fun DrawScope.drawHighlightColRowSec(selectCell: Cell) {
