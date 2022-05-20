@@ -3,7 +3,6 @@ package com.jansir.composesudoku.ui.sudoku
 import android.graphics.Typeface
 import android.view.MotionEvent
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -32,7 +31,7 @@ var sudoku_text_size = 20.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SudokuGameView(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+fun SudokuGameView(modifier: Modifier = Modifier, viewModel: SudokuGameViewModel) {
     println("SudokuView  执行")
     val textPaint = Paint().apply {
         color = AppTheme.colors.sudokuview_text_color

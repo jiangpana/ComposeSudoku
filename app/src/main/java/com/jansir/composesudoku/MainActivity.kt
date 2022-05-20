@@ -6,11 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -21,16 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jansir.composesudoku.ui.sudoku.MainViewModel
 import com.jansir.composesudoku.ui.sudoku.SudokuGameView
+import com.jansir.composesudoku.ui.sudoku.SudokuGameViewModel
 import com.jansir.composesudoku.ui.sudoku.SudokuOperateAction
 import com.jansir.composesudoku.ui.theme.AppTheme
 import com.jansir.composesudoku.ui.theme.ComposeSudokuTheme
 import com.jansir.composesudoku.ui.theme.appThemeState
+import java.util.*
 
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +36,7 @@ class MainActivity : ComponentActivity() {
         lateinit var context: Context
     }
 
+    var time =0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +44,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ComposeSudokuTheme {
+
                 // A surface container using the 'background' color from the theme
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     val viewModel = remember {
-                        MainViewModel()
+                        SudokuGameViewModel()
                     }
                     Text(
                         text = "Sudoku",
@@ -60,7 +59,24 @@ class MainActivity : ComponentActivity() {
                         fontSize = 50.sp,
                         modifier = Modifier.padding(10.dp)
                     )
+                    var timeStr by remember{
+                        mutableStateOf("00:00:00")
+                    }
+                    val timer = remember{
+                        Timer()
+                    }
+                    LaunchedEffect(key1 = "", block = {
+                        println("LaunchedEffect")
+                        timer.schedule(object : TimerTask() {
+                            override fun run() {
+                                println("thread name = ${Thread.currentThread().name}")
+                                time+=1000
+                                timeStr = time.millis2time()
 
+                            }
+                        },0,1000)
+                    })
+                    Text(text = timeStr)
                     SudokuGameView(viewModel = viewModel)
 
                     Row(
@@ -137,5 +153,14 @@ fun Test() {
             }
     )
     */
+
+}
+
+fun Long.millis2time():String{
+    val totalSeconds: Long = this / 1000
+    val seconds = totalSeconds % 60
+    val minutes = totalSeconds / 60 % 60
+    val hours = totalSeconds / 3600
+    return Formatter().format("%02d:%02d:%02d", hours, minutes, seconds).toString()
 
 }

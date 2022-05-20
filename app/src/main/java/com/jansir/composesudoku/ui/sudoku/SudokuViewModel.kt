@@ -11,7 +11,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class SudokuGameViewModel : ViewModel() {
     var viewStates by mutableStateOf(SudokuViewState())
 
     private val _viewEvents = Channel<SudokuOperateAction>(Channel.BUFFERED)
