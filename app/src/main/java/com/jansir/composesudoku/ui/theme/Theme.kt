@@ -69,9 +69,9 @@ fun ComposeSudokuTheme(
     )
 
     val systemUiCtrl = rememberSystemUiController()
-    systemUiCtrl.setStatusBarColor(appColors.themeUi)
-    systemUiCtrl.setNavigationBarColor(appColors.themeUi)
-    systemUiCtrl.setSystemBarsColor(appColors.themeUi)
+    systemUiCtrl.setStatusBarColor(appColors.sudoku_view_bg)
+    systemUiCtrl.setNavigationBarColor(appColors.sudoku_view_bg)
+    systemUiCtrl.setSystemBarsColor(appColors.sudoku_view_bg)
 
     ProvideWindowInsets {
         CompositionLocalProvider(LocalAppColors provides appColors, content = content)

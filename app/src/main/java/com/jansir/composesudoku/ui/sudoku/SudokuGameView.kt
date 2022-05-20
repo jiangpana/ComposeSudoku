@@ -2,6 +2,9 @@ package com.jansir.composesudoku.ui.sudoku
 
 import android.graphics.Typeface
 import android.view.MotionEvent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.jansir.composesudoku.ext.toPx
 import com.jansir.composesudoku.game.Cell
 import com.jansir.composesudoku.ui.theme.AppTheme
 import com.jansir.composesudoku.ui.widget.SampleAlertDialog
@@ -41,9 +45,20 @@ fun SudokuGameView(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     val data = viewModel.viewStates.cells!!
     val selectCell =  viewModel.viewStates.selectCell
 
+    val textAnimate = remember { Animatable(sudoku_text_size.toPx()) }
     LaunchedEffect(Unit) {
         viewModel.viewEvents.collect {
-
+            if (it is SudokuOperateAction.DO_ANIMATION){
+                if (!textAnimate.isRunning){
+                    textAnimate.stop()
+                    textAnimate.snapTo(0f)
+                    textAnimate.animateTo(sudoku_text_size.toPx(),
+                        animationSpec = tween(
+                            durationMillis = 500
+                        )
+                    )
+                }
+            }
         }
     }
     if (viewModel.viewStates.gameSuccess){
@@ -79,14 +94,14 @@ fun SudokuGameView(modifier: Modifier = Modifier, viewModel: MainViewModel) {
                     }
                 }
         ) {
-            println("Canvas Draw")
+            println("SudokuView Canvas Draw")
             width = size.width
             height = size.width
             cellWidth = (size.width) / 9.0f
             drawHighlightColRowSec(selectCell)
             drawSimilarCell(selectCell,data,similarCellColor)
             drawLine(height, width)
-            drawCellValue(data, textPaint,textUnEditPaint)
+            drawCellValue(data, textPaint,textUnEditPaint,textAnimate.value,selectCell)
         }
     }
 
@@ -145,7 +160,9 @@ private fun DrawScope.drawHighlightColRowSec(selectCell: Cell) {
 private fun DrawScope.drawCellValue(
     datas: Array<Array<Cell>>,
     textPaint: Paint,
-    textUnEditPaint: Paint
+    textUnEditPaint: Paint,
+    textAnimateFloat: Float,
+    selectCell: Cell
 ) {
     datas.forEachIndexed { rowIndex, ints ->
         ints.forEachIndexed { colIndex, cell ->
@@ -157,7 +174,11 @@ private fun DrawScope.drawCellValue(
                     isDither = true
                     typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
                     textAlign = android.graphics.Paint.Align.CENTER
-                    textSize = sudoku_text_size.toPx()
+                    if (cell == selectCell){
+                        textSize = textAnimateFloat
+                    }else{
+                        textSize = sudoku_text_size.toPx()
+                    }
                     color = if (cell.isEditable) textPaint.color.toArgb() else textUnEditPaint.color.toArgb()
                 }
 

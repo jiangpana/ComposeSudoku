@@ -26,13 +26,20 @@ class MainViewModel : ViewModel() {
                 }
             }
             is SudokuOperateAction.CHANGE_VALUE -> {
+                //text click 会触发 SudokuView Canvas Draw
+                // 所以不用 viewStates = viewStates.copy(selectCell = copyCell) 再去触发一次了
                 if (!viewStates.selectCell.isEditable) return
                 if (viewStates.selectCell.value == action.value){
                     action.value = 0
                 }
-                val copyCell = viewStates.selectCell.copy(value = action.value)
-                viewStates.cells!![viewStates.selectCell.rowIndex][viewStates.selectCell.colIndex] = copyCell
-//                viewStates = viewStates.copy(selectCell = copyCell)
+                val selectCell =viewStates.selectCell
+                selectCell.value =action.value
+                viewStates.cells!![selectCell.rowIndex][selectCell.colIndex] .value=  action.value
+                if (selectCell.value!=0){
+                    viewModelScope.launch {
+                        _viewEvents.send(SudokuOperateAction.DO_ANIMATION)
+                    }
+                }
                 checkSuccess()
             }
             is SudokuOperateAction.DISMISS_DIALOG -> {
@@ -47,8 +54,8 @@ class MainViewModel : ViewModel() {
                         }
                     }
                 }
-                val selectCell1 = cells[0][0]
-                viewStates = viewStates.copy(cells = cells, selectCell = selectCell1)
+                viewStates.selectCell = viewStates.cells!![0][0]
+                viewStates = viewStates.copy(cells = cells)
             }
         }
 
@@ -64,32 +71,33 @@ class MainViewModel : ViewModel() {
             }
         }
         if (isSuc) {
+            viewStates = viewStates.copy(gameSuccess = isSuc)
             viewModelScope.launch {
                 _viewEvents.send(SudokuOperateAction.SUC)
             }
-            viewStates = viewStates.copy(gameSuccess = true)
+
         }
     }
 }
 
 data class SudokuViewState(
-    val gameSuccess: Boolean = false,
+    var gameSuccess: Boolean = false,
     val cells: Array<Array<Cell>>? = QuesProvider.getQuesArray2d(),
-    val selectCell: Cell = cells!![0][0],
+    var selectCell: Cell = cells!![0][0],
 ) {
 
     override fun equals(other: Any?): Boolean {
         println("SudokuViewState equals 调用")
-        //set 时候   return false 会刷新
-        //set get   value 有改变会刷新
-   /*     if (this === other) return true
+        //  viewStates = viewStates.copy(cells = cells)
+        //  return false 会刷新
+        if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as SudokuViewState
 
         if (gameSuccess != other.gameSuccess) return false
         if (!cells.contentDeepEquals(other.cells)) return false
-        if (selectCell != other.selectCell) return false*/
+        if (selectCell != other.selectCell) return false
 
         return true
     }
@@ -108,4 +116,5 @@ sealed class SudokuOperateAction() {
     object SUC : SudokuOperateAction()
     object DISMISS_DIALOG : SudokuOperateAction()
     object RE_GAME : SudokuOperateAction()
+    object DO_ANIMATION : SudokuOperateAction()
 }
