@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ComposeSudoku</string>
+    <string name="switch_themes">切换主题</string>
+    <string name="game_success">游戏成功</string>
+    <string name="restart_the_game">重新开始游戏?</string>
+    <string name="cd_back">Back</string>
+    <string name="game_time">时间</string>
 </resources>

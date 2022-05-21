@@ -1,4 +1,4 @@
-package com.jansir.composesudoku.ui.sudoku
+package com.jansir.composesudoku.ui.main
 
 import android.graphics.Typeface
 import android.view.MotionEvent
@@ -18,11 +18,10 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.jansir.composesudoku.ext.isPortrait
 import com.jansir.composesudoku.ext.toPx
 import com.jansir.composesudoku.game.Cell
 import com.jansir.composesudoku.ui.theme.AppTheme
-import com.jansir.composesudoku.ui.widget.SampleAlertDialog
-import kotlinx.coroutines.flow.collect
 
 var cellWidth = 0f
 var sudoku_view_padding = 20.dp
@@ -31,7 +30,7 @@ var sudoku_text_size = 20.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SudokuGameView(modifier: Modifier = Modifier, viewModel: SudokuGameViewModel) {
+fun SudokuGameView(modifier: Modifier = Modifier, viewModel: SudokuViewModel) {
     println("SudokuView  执行")
     val textPaint = Paint().apply {
         color = AppTheme.colors.sudokuview_text_color
@@ -60,31 +59,21 @@ fun SudokuGameView(modifier: Modifier = Modifier, viewModel: SudokuGameViewModel
             }
         }
     }
-    if (viewModel.viewStates.gameSuccess){
-        SampleAlertDialog(
-            title = "游戏成功",
-            content = "重新开始游戏?",
-            onConfirmClick = {
-                viewModel.dispatch(SudokuOperateAction.RE_GAME)
-            },
-            onDismiss = {
-                viewModel.dispatch(SudokuOperateAction.DISMISS_DIALOG)
-            }
-        )
-    }
+
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    var width = 0f
-    var height = 0f
+    val screenWidth= if (isPortrait()){
+        configuration.screenWidthDp.dp
+    }else {
+        configuration.screenHeightDp.dp.times(0.9f)
+    }
     Box(
         modifier = modifier
             .width(screenWidth)
             .height(screenWidth)
     ) {
-
         Canvas(
             modifier = Modifier
-                .padding(sudoku_view_padding)
+                .padding(start = sudoku_view_padding, end = sudoku_view_padding)
                 .fillMaxSize()
                 .background(AppTheme.colors.sudoku_view_bg)
                 .pointerInteropFilter {
@@ -94,12 +83,11 @@ fun SudokuGameView(modifier: Modifier = Modifier, viewModel: SudokuGameViewModel
                 }
         ) {
             println("SudokuView Canvas Draw")
-            width = size.width
-            height = size.width
+            val width =  size.width
             cellWidth = (size.width) / 9.0f
             drawHighlightColRowSec(selectCell)
             drawSimilarCell(selectCell,data,similarCellColor)
-            drawLine(height, width)
+            drawLine(width)
             drawCellValue(data, textPaint,textUnEditPaint,textAnimate.value,selectCell)
         }
     }
@@ -203,13 +191,12 @@ private fun DrawScope.drawCellValue(
 }
 
 private fun DrawScope.drawLine(
-    height: Float,
     width: Float
 ) {
     //画9x9垂直线
     for (c in 0..9) {
         val start = Offset(c * cellWidth, 0f)
-        val end = Offset(c * cellWidth, height)
+        val end = Offset(c * cellWidth, width)
         drawLine(Color.Black, start, end, strokeWidth = 2.dp.value)
     }
 
@@ -222,7 +209,7 @@ private fun DrawScope.drawLine(
     //画3x3 垂直粗线
     for (c in 0..3) {
         val start = Offset(c * cellWidth * 3, 0f)
-        val end = Offset(c * cellWidth * 3, height)
+        val end = Offset(c * cellWidth * 3, width)
         drawLine(Color.Black, start, end, strokeWidth = 8.dp.value, cap = StrokeCap.Square)
     }
 

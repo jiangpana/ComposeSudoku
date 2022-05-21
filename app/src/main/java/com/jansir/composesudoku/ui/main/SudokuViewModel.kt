@@ -1,4 +1,4 @@
-package com.jansir.composesudoku.ui.sudoku
+package com.jansir.composesudoku.ui.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,14 +8,37 @@ import androidx.lifecycle.viewModelScope
 import com.jansir.composesudoku.game.Cell
 import com.jansir.composesudoku.game.QuesProvider
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class SudokuGameViewModel : ViewModel() {
+class SudokuViewModel : ViewModel() {
+    private val _timerState = MutableStateFlow(
+        TimerData()
+    )
+    val timerState: StateFlow<TimerData> = _timerState
     var viewStates by mutableStateOf(SudokuViewState())
 
     private val _viewEvents = Channel<SudokuOperateAction>(Channel.BUFFERED)
     val viewEvents = _viewEvents.receiveAsFlow()
+
+
+    init {
+        initTimer()
+    }
+
+    private fun initTimer() {
+        viewModelScope.launch {
+            while (true) {
+                val next = timerState.value.millis.plus(1000)
+                _timerState.emit(timerState.value.copy(millis = next))
+                delay(1000L)
+            }
+        }
+    }
+
 
     fun dispatch(action: SudokuOperateAction) {
         when (action) {
